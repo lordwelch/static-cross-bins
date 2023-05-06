@@ -1,5 +1,5 @@
 NAME := curl
-CURL_VERSION := 7.83.1
+CURL_VERSION := 8.0.1
 CURL_URL := https://github.com/curl/curl/releases/download/curl-$(subst .,_,$(CURL_VERSION))/curl-$(CURL_VERSION).tar.gz
 CURL_PROGRAMS := curl
 CURL_LIBRARIES := libcurl.a
@@ -34,7 +34,7 @@ $(BUILD_FLAG): $$(libz)
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(filter -L%,$(LDFLAGS))"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)" LDFLAGS="$(LDFLAGS) -all-static"
-	$(MAKE) -C "$(SRC)" install-exec
+	$(MAKE) -C "$(SRC)" install
 
 # Update dependencies based on chosen SSL library.
 ifeq ($(CURL_SSL),wolfssl)

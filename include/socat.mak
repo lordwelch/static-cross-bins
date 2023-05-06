@@ -1,5 +1,5 @@
 NAME := socat
-SOCAT_VERSION := 1.7.4.3
+SOCAT_VERSION := 1.7.4.4
 SOCAT_URL := http://www.dest-unreach.org/socat/download/socat-$(SOCAT_VERSION).tar.gz
 SOCAT_PROGRAMS := socat procan filan
 SOCAT_LIBRARIES :=

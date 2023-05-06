@@ -1,5 +1,5 @@
 NAME := tcpdump
-TCPDUMP_VERSION := 4.99.1
+TCPDUMP_VERSION := 4.99.4
 TCPDUMP_URL := https://www.tcpdump.org/release/tcpdump-$(TCPDUMP_VERSION).tar.gz
 TCPDUMP_PROGRAMS := tcpdump
 TCPDUMP_LIBRARIES :=

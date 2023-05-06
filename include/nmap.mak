@@ -1,5 +1,5 @@
 NAME := nmap
-NMAP_VERSION := 7.92
+NMAP_VERSION := 7.93
 NMAP_URL := https://nmap.org/dist/nmap-$(NMAP_VERSION).tgz
 NMAP_PROGRAMS := nmap nping ncat
 NMAP_LIBRARIES :=

@@ -1,5 +1,5 @@
 NAME := pcap
-PCAP_VERSION := 1.10.1
+PCAP_VERSION := 1.10.4
 PCAP_URL := https://www.tcpdump.org/release/libpcap-$(PCAP_VERSION).tar.gz
 PCAP_PROGRAMS :=
 PCAP_LIBRARIES := libpcap.a
