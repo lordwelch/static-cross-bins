@@ -18,7 +18,7 @@ $(BUILD_FLAG):
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
 	  --disable-shared --enable-static \
-	  --enable-opensslall \
+	  --enable-opensslall --enable-opensslextra --enable-curl \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)"
