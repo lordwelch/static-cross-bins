@@ -4,7 +4,7 @@ CURL_URL := https://github.com/curl/curl/releases/download/curl-$(subst .,_,$(CU
 CURL_PROGRAMS := curl
 CURL_LIBRARIES := libcurl.a
 
-CURL_CONFIG =
+CURL_CONFIG = --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 # WolfSSL results in a much smaller binary (around 1MB).
 # The only reason you'd use OpenSSL here is if you already
