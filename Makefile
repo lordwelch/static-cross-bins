@@ -312,6 +312,7 @@ clean: mostlyclean
 ifneq (,$(TARGET))
 	- $(RM) -r "$(OUTPUT)"
 	- $(RM) -r "$(SYSROOT)"
+	- $(RM) -r "$(MAKEFILE_DIR)/docker_context"
 else
 	- $(RM) -r "$(OUTPUT_ROOT)"
 	- $(RM) -r "$(TOOLCHAIN_ROOT)"

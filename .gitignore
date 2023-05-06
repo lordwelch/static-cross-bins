@@ -2,6 +2,7 @@
 output
 sources
 sysroot
+.docker_context
 
 # General
 .DS_Store
