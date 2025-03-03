@@ -108,6 +108,7 @@ MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(MAKEFILE_PATH)))
 
 SOURCE_ROOT := $(MAKEFILE_DIR)/sources
+WORK_ROOT := $(MAKEFILE_DIR)/work
 OUTPUT_ROOT := $(MAKEFILE_DIR)/output
 TOOLCHAIN_ROOT := $(MAKEFILE_DIR)/sysroot
 
@@ -115,6 +116,7 @@ SYSROOT := $(TOOLCHAIN_ROOT)/$(TARGET)
 OUTPUT := $(OUTPUT_ROOT)/$(TARGET)
 PKG_CONFIG_PATH := $(TOOLCHAIN_ROOT)/lib/pkgconfig
 
+CMAKE_DEFAULTS = -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$(SYSROOT) -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_FIND_ROOT_PATH=$(TOOLCHAIN_ROOT) -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
 # Having whitespace in our build paths _will_ result in failures.
 # In addition to failures, a path containing whitespace may cause an
 # improperly quoted $(RM) to delete things outside of the build directory.
@@ -152,7 +154,7 @@ define untar_to_dir
 mkdir -p "$(dir $(2))"
 $(DOWNLOAD) "$(2).tgz" "$(1)"
 mkdir -p "$(2).tmp"
-tar --strip-components=1 -C "$(2).tmp" -xf "$(2).tgz"
+tar xf "$(2).tgz" --strip-components=1 -C "$(2).tmp"
 $(RM) "$(2).tgz"
 mv "$(2).tmp" "$(2)"
 endef
@@ -192,7 +194,9 @@ else
 all_recipes += $$(name)
 endif
 
-src := $$(SOURCE_ROOT)/$$(name)-$$(version)
+orig_src := $$(SOURCE_ROOT)/$$(name)-$$(version)
+work_src := $$(WORK_ROOT)/$$(name)-$$(version)
+src := $$(work_src)
 bin_paths := $$(addprefix $$(OUTPUT)/bin/,$$(bin_names))
 lib_paths := $$(addprefix $$(SYSROOT)/lib/,$$(lib_names))
 
@@ -208,6 +212,7 @@ $$(bin_names) $$(lib_names): | $$(bin_paths) $$(lib_paths)
 # so binding them here the only way to guarantee the correct value.
 $$(bin_paths) $$(lib_paths): override URL := $$(url)
 $$(bin_paths) $$(lib_paths): override SRC := $$(src)
+$$(bin_paths) $$(lib_paths): override ORIG_SRC := $$(orig_src)
 
 # We potentially have multiple output files generated from one recipe.
 # If not handled correctly, building one program from the list can result in the
@@ -238,8 +243,13 @@ endif
 # Here we merely provide the recipe definition and base dependencies.
 $$(BUILD_FLAG): $$(src) | $$$$(MUSL)
 
-$$(src):
+$$(orig_src):
+	echo orig $$(ORIG_SRC)
 	$$(call untar_to_dir,$$(URL),$$@)
+
+$$(work_src): $$(orig_src)
+	rm -rf $$(SRC)
+	cp -a $$(ORIG_SRC) $$(SRC)
 endef
 
 # Never implicitly pass this makefile's command-line variables

@@ -1,7 +1,7 @@
 ifeq (libressl,$(OPENSSL))
 
 NAME := libressl
-LIBRESSL_VERSION := 3.7.1
+LIBRESSL_VERSION := 3.9.2
 LIBRESSL_URL := https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-$(LIBRESSL_VERSION).tar.gz
 LIBRESSL_PROGRAMS := openssl
 LIBRESSL_LIBRARIES := libssl.a libcrypto.a libtls.a

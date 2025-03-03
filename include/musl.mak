@@ -1,7 +1,7 @@
 # musl-cross-make hasn't had an official release since 2020 but has had many
 # updates and bigfixes since then.  Instead, we'll download a commit directly.
 NAME := musl-cross-make
-MUSL_VERSION := fe91582
+MUSL_VERSION := fd6be58
 MUSL_URL := https://github.com/richfelker/musl-cross-make/tarball/$(MUSL_VERSION)
 MUSL_SRC := $(SOURCE_ROOT)/$(NAME)-$(MUSL_VERSION)
 MUSL := $(SYSROOT)/bin/$(TARGET)-cc

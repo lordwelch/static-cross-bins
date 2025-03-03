@@ -1,5 +1,5 @@
 NAME := bash
-BASH_VERSION := 5.1.16
+BASH_VERSION := 5.2.32
 BASH_URL := https://ftp.gnu.org/gnu/bash/bash-$(BASH_VERSION).tar.gz
 BASH_PROGRAMS := bash
 BASH_LIBRARIES :=
@@ -14,10 +14,16 @@ $(eval $(call create_recipes, \
 	$(BASH_LIBRARIES), \
 ))
 
+BASH_MUSL_PATCH := $(src)/.musl
+
+$(BASH_MUSL_PATCH): $(src)
+	cd "$(SRC)" && patch -p1 < $(MAKEFILE_DIR)/include/bash-musl.patch
+	touch $(BASH_MUSL_PATCH)
+
 $(BUILD_FLAG):
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
-	  $(CONFIGURE_DEFAULTS) \
+	  $(CONFIGURE_DEFAULTS) --without-bash-malloc \
 	  --enable-static-link \
 	  $(BASH_CONFIG) \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"

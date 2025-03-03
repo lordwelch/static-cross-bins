@@ -1,5 +1,5 @@
 NAME := zlib
-ZLIB_VERSION := 1.2.13
+ZLIB_VERSION := 1.3.1
 ZLIB_URL := https://github.com/madler/zlib/archive/refs/tags/v$(ZLIB_VERSION).tar.gz
 ZLIB_PROGRAMS :=
 ZLIB_LIBRARIEES := libz.a

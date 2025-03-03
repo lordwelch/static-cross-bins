@@ -1,0 +1,83 @@
+diff --git a/builtins/wait.def b/builtins/wait.def
+index b066d78..1a49430 100644
+--- a/builtins/wait.def
++++ b/builtins/wait.def
+@@ -1,4 +1,4 @@
+-'This file is wait.def, from which is created wait.c.
++This file is wait.def, from which is created wait.c.
+ It implements the builtin "wait" in Bash.
+ 
+ Copyright (C) 1987-2021 Free Software Foundation, Inc.
+diff --git a/configure b/configure
+index 28e0913..0c3ef2c 100755
+--- a/configure
++++ b/configure
+@@ -20432,7 +20432,6 @@ printf "%s\n" "#define HAVE_DECL_STRTOIMAX $ac_have_decl" >>confdefs.h
+   if test "$ac_cv_have_decl_strtoimax" = "yes" ; then
+     HAVE_DECL_STRTOIMAX=1
+   fi
+-
+   if test "$HAVE_STRTOIMAX" = 0 || test "$HAVE_DECL_STRTOIMAX" = 0 ; then
+     bash_cv_func_strtoimax=no REPLACE_STRTOIMAX=1
+   else
+@@ -20443,7 +20442,11 @@ fi
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $bash_cv_func_strtoimax" >&5
+ printf "%s\n" "$bash_cv_func_strtoimax" >&6; }
+-if test $bash_cv_func_strtoimax = yes; then
++if test "$ac_cv_have_decl_strtoimax" = "yes" ; then
++printf "%s\n" "#define HAVE_DECL_STRTOIMAX 1" >>confdefs.h
++
++fi
++if test $bash_cv_func_strtoimax = no; then
+ case " $LIBOBJS " in
+   *" strtoimax.$ac_objext "* ) ;;
+   *) LIBOBJS="$LIBOBJS strtoimax.$ac_objext"
+diff --git a/m4/strtoimax.m4 b/m4/strtoimax.m4
+index 3098572..4d6cb3b 100644
+--- a/m4/strtoimax.m4
++++ b/m4/strtoimax.m4
+@@ -21,7 +21,6 @@ AC_CACHE_VAL(bash_cv_func_strtoimax,
+   if test "$ac_cv_have_decl_strtoimax" = "yes" ; then
+     HAVE_DECL_STRTOIMAX=1
+   fi
+-
+   if test "$HAVE_STRTOIMAX" = 0 || test "$HAVE_DECL_STRTOIMAX" = 0 ; then
+     bash_cv_func_strtoimax=no REPLACE_STRTOIMAX=1
+   else
+@@ -29,7 +28,10 @@ AC_CACHE_VAL(bash_cv_func_strtoimax,
+   fi
+ ])
+ AC_MSG_RESULT($bash_cv_func_strtoimax)
+-if test $bash_cv_func_strtoimax = yes; then
++if test "$ac_cv_have_decl_strtoimax" = "yes" ; then
++AC_DEFINE([HAVE_DECL_STRTOIMAX], [1])
++fi
++if test $bash_cv_func_strtoimax = no; then
+ AC_LIBOBJ(strtoimax)
+ fi
+ ])
+diff --git a/tests/array.right b/tests/array.right
+index 6227885..36d4936 100644
+--- a/tests/array.right
++++ b/tests/array.right
+@@ -757,6 +757,8 @@ declare -A A=([$'\t']="X" ["*"]="X" [" "]="X" ["@"]="X" )
+ declare -A A=(["*"]="X" ["@"]="X" )
+ ./array27.sub: line 76: declare: `A[]]=X': not a valid identifier
+ declare -A A=(["*"]="X" ["@"]="X" )
++./array27.sub: line 81: y[]: bad array subscript
++./array27.sub: line 81: y[]: bad array subscript
+ declare -a bug4=([0]="" [1]="5" [2]="" [3]="1" [4]="")
+ declare -a bug=([0]="" [1]="5" [2]="" [3]="1" [4]="")
+ declare -a bug2=([0]="")
+diff --git a/tests/array27.sub b/tests/array27.sub
+index e2a1e70..8564564 100644
+--- a/tests/array27.sub
++++ b/tests/array27.sub
+@@ -76,3 +76,6 @@ for k in ']' '*' '@'; do
+    declare "A[$k]=X"
+ done
+ declare -p A
++
++# empty arrays in arith contexts
++(( y[$none] ))

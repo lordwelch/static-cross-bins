@@ -7,7 +7,7 @@ set -e
 if [ -e .docker_context ]; then
 	rm -r .docker_context/*
 fi
-mkdir -p .docker_context output sources sysroot
-cp -r Dockerfile Makefile include .docker_context
+mkdir -p .docker_context output sources work sysroot
+cp -a Dockerfile Makefile include .docker_context
 docker build -t static-builder .docker_context
-docker run -it -v "${PWD}/output":"/build/output:Z" -v "${PWD}/sources":"/build/sources:Z" --rm static-builder "$@"
+docker run -it -v "${PWD}/output":"/build/output:Z" -v "${PWD}/sources":"/build/sources:Z" -v "${PWD}/work":"/build/work:Z" -v "${PWD}/sysroot":"/build/sysroot:Z" --rm static-builder "$@"

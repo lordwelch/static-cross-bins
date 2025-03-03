@@ -1,5 +1,5 @@
 NAME := strace
-STRACE_VERSION := 6.2
+STRACE_VERSION := 6.10
 STRACE_URL := https://github.com/strace/strace/releases/download/v$(STRACE_VERSION)/strace-$(STRACE_VERSION).tar.xz
 STRACE_PROGRAMS := strace
 STRACE_LIBRARIES :=

@@ -1,36 +1,36 @@
-NAME := libexpat
-EXPAT_VERSION := 2.6.2
+NAME := libmnl
+LIBMNL_VERSION := 1.0.5
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so
 # tar/gzip, tar/bzip2, etc, are fine.  If the archive is in a different
 # format, a recipe to create $(SRC) will need to be provided.
-EXPAT_URL := https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(EXPAT_VERSION))/expat-$(EXPAT_VERSION).tar.gz
+LIBMNL_URL := https://www.netfilter.org/projects/libmnl/files/libmnl-$(LIBMNL_VERSION).tar.bz2
 
 # The list of all programs that the package builds.
 # These targets can be called and built from the command line.
 # If the package provides no programs, leave this list empty.
-# EXPAT_PROGRAMS := program-a program-b program-c
+LIBMNL_PROGRAMS :=
 
 # The list of library names that the package builds.
 # If the package provides no libraries, leave this list empty.
 # Libraries will be represented as variables so that other packages may use them.
 # For example, libsomething.a will be available as $$(libsomething).
-EXPAT_LIBRARIES := libexpat.a
+LIBMNL_LIBRARIES := libmnl.a
 
 # Allow the user to add any make, autoconf, or configure options that they want.
 # Feel free to put any reasonable default values here.
-# EXPAT_CONFIG = --disable-unpopular-feature --disable-bulky-feature
+LIBMNL_CONFIG =
 
 # This creates the recipe chain that downloads, extracts, builds, and strips
 # the binaries created by this package.  This makes it so that only the main
 # build recipe's contents need to be provided by the package author.
 $(eval $(call create_recipes, \
 	$(NAME), \
-	$(EXPAT_VERSION), \
-	$(EXPAT_URL), \
-	$(EXPAT_PROGRAMS), \
-	$(EXPAT_LIBRARIES), \
+	$(LIBMNL_VERSION), \
+	$(LIBMNL_URL), \
+	$(LIBMNL_PROGRAMS), \
+	$(LIBMNL_LIBRARIES), \
 ))
 
 # This is the main build recipe!
@@ -46,20 +46,19 @@ $(BUILD_FLAG): $$(libz)
 # The configure step defines what features should be enabled for the program.
 # If available, the --host and --prefix values should always be the values below.
 # Try to only hard-code the flags that are critical to a successful static build.
-# Optional flags should be put in EXPAT_CONFIG so the user can override them.
-
+# Optional flags should be put in LIBMNL_CONFIG so the user can override them.
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
 	  --enable-static --disable-shared \
 	  --with-zlib="$(SYSROOT)" \
-	  $(EXPAT_CONFIG) \
+	  $(LIBMNL_CONFIG) \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)"
 	$(MAKE) -C "$(SRC)" install
 
 # All programs should add themselves to the ALL_PROGRAMS list.
-ALL_PROGRAMS += $(EXPAT_PROGRAMS)
+# ALL_PROGRAMS += $(LIBMNL_PROGRAMS)
 
 # Only programs that most users would want should be added to DEFAULT_PROGRAMS.
-DEFAULT_PROGRAMS += $(EXPAT_PROGRAMS)
+# DEFAULT_PROGRAMS += $(LIBMNL_PROGRAMS)

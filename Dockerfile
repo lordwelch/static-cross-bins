@@ -12,7 +12,7 @@ RUN apt-get update && apt-get upgrade -y \
     make autoconf automake libtool patch \
     flex bison \
     curl \
-    tar gzip bzip2 xz-utils
+    tar gzip bzip2 xz-utils cmake build-essential pkg-config linux-headers-generic
 
 RUN mkdir -p "/build" && chown 1000:1000 /build
 COPY "Makefile" "/build/"

@@ -1,5 +1,5 @@
 NAME := wolfssl
-WOLFSSL_VERSION := 5.5.0
+WOLFSSL_VERSION := 5.7.2
 WOLFSSL_URL := https://github.com/wolfSSL/wolfssl/archive/refs/tags/v$(WOLFSSL_VERSION)-stable.tar.gz
 WOLFSSL_PROGRAMS :=
 WOLFSSL_LIBRARIES := libwolfssl.a
@@ -14,6 +14,7 @@ $(eval $(call create_recipes, \
 
 $(BUILD_FLAG):
 	$(eval $(call activate_toolchain,$@))
+	cd "$(SRC)" && sed -i 's@cut >/dev/null 2>&1 </dev/null@which cut >/dev/null 2>\&1 </dev/null@g' configure*
 	cd "$(SRC)" && autoreconf -i
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \

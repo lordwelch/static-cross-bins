@@ -1,5 +1,5 @@
 NAME := git
-GIT_VERSION := 2.40.1
+GIT_VERSION := 2.46.0
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so
@@ -41,8 +41,8 @@ GIT_WOLFSSL_PATCH := $(src)/.wolfssl
 # depends on any libraries, add their variable representations to this target's
 # dependency list.  For example, if the package depends on libsomething.a,
 # add $$(libsomething) to $(BUILD_FLAG)'s dependencies.
-$(GIT_WOLFSSL_PATCH):
-	cd "$(SRC)" && patch -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch
+$(GIT_WOLFSSL_PATCH): $(src)
+	cd "$(SRC)" && patch -N -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch
 	touch $(GIT_WOLFSSL_PATCH)
 
 TOOLS = AR=$(SYSROOT)/bin/$(TARGET)-ar AS=$(SYSROOT)/bin/$(TARGET)-as CC=$(SYSROOT)/bin/$(TARGET)-cc CXX=$(SYSROOT)/bin/$(TARGET)-g++ LD=$(SYSROOT)/bin/$(TARGET)-ld NM=$(SYSROOT)/bin/$(TARGET)-nm OBJCOPY=$(SYSROOT)/bin/$(TARGET)-objcopy OBJDUMP=$(SYSROOT)/bin/$(TARGET)-objdump RANLIB=$(SYSROOT)/bin/$(TARGET)-ranlib READELF=$(SYSROOT)/bin/$(TARGET)-readelf STRIP=$(SYSROOT)/bin/$(TARGET)-strip prefix="$(SYSROOT)"
@@ -57,6 +57,7 @@ $(BUILD_FLAG): $$(libz) $$(libcurl) $$(libssl) $$(openssl) $$(curl) $(libexpat) 
 # Optional flags should be put in GIT_CONFIG so the user can override them.
 
 	$(MAKE) -C "$(SRC)" clean
+	- $(RM) -rf /tmp/git
 	$(MAKE) -C "$(SRC)" V=1 $(TOOLS) \
 		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) \
 		CURL_LDFLAGS="-L/build/sysroot/aarch64-linux-musl/lib -lcurl $(SSL_CURL_FLAGS) -lm -lz" \
@@ -69,11 +70,12 @@ $(BUILD_FLAG): $$(libz) $$(libcurl) $$(libssl) $$(openssl) $$(curl) $(libexpat) 
 		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) \
 		CURL_LDFLAGS="-L/build/sysroot/aarch64-linux-musl/lib -lcurl $(SSL_CURL_FLAGS) -lm -lz" \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) DESTDIR=/tmp/git install
-	tar czf $(SYSROOT)/bin/git.tar.gz -C /tmp/git .
+	cd /tmp/git && tar czf $(SYSROOT)/bin/git.tar.gz *
+	cd "$(SRC)" && patch -R -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch
 
 SSL_FLAGS :=
 SSL_CURL_FLAGS := -lssl -lcrypto
-ifeq (wolfssl,$(OPENSSL))
+ifeq (wolfssl,$(LIB_SSL))
 SSL_FLAGS := USE_WOLFSSL=1 OPENSSL_SHA1=1 OPENSSL_SHA256=1 WOLFSSSLDIR="$(SYSROOT)"
 SSL_CURL_FLAGS := -lwolfssl
 

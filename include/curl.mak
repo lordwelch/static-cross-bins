@@ -1,16 +1,16 @@
 NAME := curl
-CURL_VERSION := 8.0.1
+CURL_VERSION := 8.9.1
 CURL_URL := https://github.com/curl/curl/releases/download/curl-$(subst .,_,$(CURL_VERSION))/curl-$(CURL_VERSION).tar.gz
 CURL_PROGRAMS := curl
 CURL_LIBRARIES := libcurl.a
 
-CURL_CONFIG = --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+CURL_CONFIG = --with-ca-bundle=/etc/ssl/ca-bundle.pem
 
 # WolfSSL results in a much smaller binary (around 1MB).
 # The only reason you'd use OpenSSL here is if you already
 # need the library for other things and don't care about size.
-CURL_SSL := wolfssl
-# CURL_SSL := openssl
+LIB_SSL := wolfssl
+# LIB_SSL := openssl
 
 $(eval $(call create_recipes, \
 	$(NAME), \
@@ -29,7 +29,7 @@ $(BUILD_FLAG): $$(libz)
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
-	  --disable-shared --enable-static --with-$(CURL_SSL) \
+	  --disable-shared --enable-static --with-$(LIB_SSL) \
 	  $(CURL_CONFIG) \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(filter -L%,$(LDFLAGS))"
 	$(MAKE) -C "$(SRC)" clean
@@ -37,12 +37,12 @@ $(BUILD_FLAG): $$(libz)
 	$(MAKE) -C "$(SRC)" install
 
 # Update dependencies based on chosen SSL library.
-ifeq ($(CURL_SSL),wolfssl)
+ifeq ($(LIB_SSL),wolfssl)
 $(BUILD_FLAG): $$(libwolfssl)
-else ifeq ($(CURL_SSL),openssl)
+else ifeq ($(LIB_SSL),openssl)
 $(BUILD_FLAG): $$(libssl)
 else
-$(error Invalid CURL_SSL selection: $(CURL_SSL))
+$(error Invalid LIB_SSL selection: $(LIB_SSL))
 endif
 
 ALL_PROGRAMS += $(CURL_PROGRAMS)
