@@ -1,10 +1,10 @@
 NAME := curl
-CURL_VERSION := 8.9.1
+CURL_VERSION := 8.12.1
 CURL_URL := https://github.com/curl/curl/releases/download/curl-$(subst .,_,$(CURL_VERSION))/curl-$(CURL_VERSION).tar.gz
 CURL_PROGRAMS := curl
 CURL_LIBRARIES := libcurl.a
 
-CURL_CONFIG = --with-ca-bundle=/etc/ssl/ca-bundle.pem
+CURL_CONFIG = --with-ca-bundle=/etc/ssl/ca-bundle.pem --with-ca-embed=/etc/ssl/ca-bundle.pem
 
 # WolfSSL results in a much smaller binary (around 1MB).
 # The only reason you'd use OpenSSL here is if you already
@@ -25,13 +25,14 @@ $(eval $(call create_recipes, \
 # configure script doesn't use libtool, so the flag must be injected
 # at built-time only, otherwise the configure will fail.
 #   See https://stackoverflow.com/a/54168321/477563
-$(BUILD_FLAG): $$(libz)
+$(BUILD_FLAG): $$(libz) $$(libpsl) $$(libzstd)
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
-	  --disable-shared --enable-static --with-$(LIB_SSL) \
+	  --with-zlib="$(SYSROOT)" \
+	  --disable-shared --enable-static --with-$(LIB_SSL) --without-libpsl \
 	  $(CURL_CONFIG) \
-	  CFLAGS="$(CFLAGS)" LDFLAGS="$(filter -L%,$(LDFLAGS))"
+	  CFLAGS="$(filter-out -I%,$(CFLAGS))" CPPFLAGS="$(CXXFLAGS)" LDFLAGS="$(filter -L%,$(LDFLAGS))" CC="$(CC)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)" LDFLAGS="$(LDFLAGS) -all-static"
 	$(MAKE) -C "$(SRC)" install

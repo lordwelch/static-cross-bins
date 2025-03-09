@@ -1,5 +1,5 @@
 NAME := zstd
-ZSTD_VERSION := 1.5.6
+ZSTD_VERSION := 1.5.7
 ZSTD_URL := https://github.com/facebook/zstd/releases/download/v$(ZSTD_VERSION)/zstd-$(ZSTD_VERSION).tar.gz
 ZSTD_PROGRAMS := zstd
 ZSTD_LIBRARIES := libzstd.a
@@ -22,8 +22,8 @@ $(BUILD_FLAG): $$(libz)
 	$(eval $(call activate_toolchain,$@))
 	$(MAKE) -C "$(SRC)" clean
 	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
-	  $(MAKE) -C "$(SRC)" UNAME="Linux"
-	$(MAKE) -C "$(SRC)" install UNAME="Linux" PREFIX="$(SYSROOT)"
+	  $(MAKE) -C "$(SRC)"
+	$(MAKE) -C "$(SRC)" install PREFIX="$(SYSROOT)"
 
 ALL_PROGRAMS += $(ZSTD_PROGRAMS)
 DEFAULT_PROGRAMS += $(ZSTD_PROGRAMS)

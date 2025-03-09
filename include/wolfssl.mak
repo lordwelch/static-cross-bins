@@ -1,5 +1,5 @@
 NAME := wolfssl
-WOLFSSL_VERSION := 5.7.2
+WOLFSSL_VERSION := 5.7.6
 WOLFSSL_URL := https://github.com/wolfSSL/wolfssl/archive/refs/tags/v$(WOLFSSL_VERSION)-stable.tar.gz
 WOLFSSL_PROGRAMS :=
 WOLFSSL_LIBRARIES := libwolfssl.a
@@ -12,14 +12,14 @@ $(eval $(call create_recipes, \
 	$(WOLFSSL_LIBRARIES), \
 ))
 
-$(BUILD_FLAG):
+$(BUILD_FLAG): $$(libz)
 	$(eval $(call activate_toolchain,$@))
-	cd "$(SRC)" && sed -i 's@cut >/dev/null 2>&1 </dev/null@which cut >/dev/null 2>\&1 </dev/null@g' configure*
+	cd "$(SRC)" && sed -i -e 's@cut >/dev/null 2>&1 </dev/null@which cut >/dev/null 2>\&1 </dev/null@g' configure*
 	cd "$(SRC)" && autoreconf -i
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
 	  --disable-shared --enable-static \
-	  --enable-opensslall --enable-opensslextra --enable-curl \
+	  --enable-opensslall --enable-oldnames --enable-opensslextra --enable-curl \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)"

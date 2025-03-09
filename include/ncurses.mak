@@ -22,10 +22,10 @@ $(BUILD_FLAG):
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
-	  --without-manpages --without-progs --disable-ext-funcs \
-	  --without-tack --without-tests --without-debug \
+	  --without-manpages --without-progs --disable-lib-suffixes --disable-ext-funcs \
+	  --without-tack --without-tests --with-termlib --enable-termcap --without-debug \
 	  $(NCURSES_CONFIG) \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)" libs
-	$(MAKE) -C "$(SRC)" install.libs
+	$(MAKE) -C "$(SRC)" V=1 install.libs

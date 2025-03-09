@@ -50,9 +50,8 @@ $(BUILD_FLAG): $$(libz)
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
 	  --enable-static --disable-shared \
-	  --with-zlib="$(SYSROOT)" \
 	  $(LIBMNL_CONFIG) \
-	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" CC="$(CC)"
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)"
 	$(MAKE) -C "$(SRC)" install

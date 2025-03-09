@@ -1,20 +1,16 @@
 # Despite convention, Ubuntu's "latest" tag points to the latest LTS release.
-FROM ubuntu:latest
-
-LABEL org.opencontainers.image.authors="llamasoft@rm-rf.email"
-LABEL org.opencontainers.image.url="https://github.com/llamasoft/static-builder"
+FROM docker.io/library/alpine:latest
 
 # This is all that's required for the build process.
 # Some packages are already installed but are included for completeness.
-RUN apt-get update && apt-get upgrade -y \
- && apt-get install -y \
-    gcc g++ \
+RUN apk add install -y \
+    zig llvm \
     make autoconf automake libtool patch \
     flex bison \
     curl \
-    tar gzip bzip2 xz-utils cmake build-essential pkg-config linux-headers-generic
+    tar zstd gzip bzip2 xz-utils cmake build-essential pkg-config linux-headers-generic
 
-RUN mkdir -p "/build" && chown 1000:1000 /build
+RUN install -d -o 1000 -g 1000 "/build"
 COPY "Makefile" "/build/"
 COPY "include" "/build/include"
 VOLUME "/build"

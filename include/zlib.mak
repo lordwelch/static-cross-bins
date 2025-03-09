@@ -18,7 +18,7 @@ $(eval $(call create_recipes, \
 $(BUILD_FLAG):
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
-	  --prefix="$(SYSROOT)" --static
+	  --prefix="$(SYSROOT)" --static -u=Linux
 	$(MAKE) -C "$(SRC)" clean
 	$(MAKE) -C "$(SRC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" install

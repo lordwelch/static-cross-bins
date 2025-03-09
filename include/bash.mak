@@ -1,5 +1,5 @@
 NAME := bash
-BASH_VERSION := 5.2.32
+BASH_VERSION := 5.2.37
 BASH_URL := https://ftp.gnu.org/gnu/bash/bash-$(BASH_VERSION).tar.gz
 BASH_PROGRAMS := bash
 BASH_LIBRARIES :=
@@ -20,11 +20,11 @@ $(BASH_MUSL_PATCH): $(src)
 	cd "$(SRC)" && patch -p1 < $(MAKEFILE_DIR)/include/bash-musl.patch
 	touch $(BASH_MUSL_PATCH)
 
-$(BUILD_FLAG):
+$(BUILD_FLAG): $$(libncurses) $$(libreadline)
 	$(eval $(call activate_toolchain,$@))
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) --without-bash-malloc \
-	  --enable-static-link \
+	  --enable-static-link --with-curses --with-readline \
 	  $(BASH_CONFIG) \
 	  CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
 	$(MAKE) -C "$(SRC)" clean

@@ -52,7 +52,7 @@ endif
 SHELL := /bin/bash
 
 CFLAGS = -g0 -Os
-CXXFLAGS = $(CFLAGS)
+CXXFLAGS = -g0 -Os
 
 # Just in case the user forgets that we're doing static builds.
 override LDFLAGS  += -static
@@ -95,7 +95,7 @@ endif
 OPENSSL := libressl
 # OPENSSL := openssl
 
-BUILD_TRIPLE := $(shell $(CC) -dumpmachine 2>/dev/null)
+BUILD_TRIPLE := $(shell $(filter-out --target%,$(CC)) -dumpmachine 2>/dev/null)
 CONFIGURE_DEFAULTS = --build="$(BUILD_TRIPLE)" --host="$(TARGET)" --prefix="$(SYSROOT)"
 
 
@@ -136,27 +136,29 @@ endef
 
 define activate_toolchain
 $(call activate_paths,$(1))
-$(1): export AR=$(SYSROOT)/bin/$(TARGET)-ar
-$(1): export AS=$(SYSROOT)/bin/$(TARGET)-as
-$(1): export CC=$(SYSROOT)/bin/$(TARGET)-cc
-$(1): export CXX=$(SYSROOT)/bin/$(TARGET)-g++
-$(1): export LD=$(SYSROOT)/bin/$(TARGET)-ld
-$(1): export NM=$(SYSROOT)/bin/$(TARGET)-nm
-$(1): export OBJCOPY=$(SYSROOT)/bin/$(TARGET)-objcopy
-$(1): export OBJDUMP=$(SYSROOT)/bin/$(TARGET)-objdump
-$(1): export RANLIB=$(SYSROOT)/bin/$(TARGET)-ranlib
-$(1): export READELF=$(SYSROOT)/bin/$(TARGET)-readelf
-$(1): export STRIP=$(SYSROOT)/bin/$(TARGET)-strip
+$(1): export HOSTCC=zig cc
+$(1): export HOSTCXX=zig c++
+$(1): export AR=/opt/homebrew/bin/zig ar
+$(1): export AS=llvm-as
+$(1): export CC=/opt/homebrew/bin/zig cc --target=$(TARGET)
+$(1): export CXX=/opt/homebrew/bin/zig c++ --target=$(TARGET)
+# $(1): export LD=llvm-ld
+$(1): export NM=llvm-nm
+$(1): export OBJCOPY=/opt/homebrew/bin/zig objcopy
+$(1): export OBJDUMP=llvm-objdump
+$(1): export RANLIB=/opt/homebrew/bin/zig ranlib
+$(1): export READELF=llvm-readelf
+$(1): export STRIP=llvm-strip
 endef
 
 # Downloads and unpacks a tar file.
-define untar_to_dir
+define tar_to_tar_zstd
 mkdir -p "$(dir $(2))"
-$(DOWNLOAD) "$(2).tgz" "$(1)"
+$(DOWNLOAD) "$(2).download" "$(1)"
 mkdir -p "$(2).tmp"
-tar xf "$(2).tgz" --strip-components=1 -C "$(2).tmp"
-$(RM) "$(2).tgz"
-mv "$(2).tmp" "$(2)"
+tar --strip-components=1 -C "$(2).tmp" -xf "$(2).download"
+tar --zstd -C "$(2).tmp" -cf "$(2)" "." || ($(RM) "$(2)" ; exit 1)
+$(RM) -rf "$(2).download" "$(2).tmp"
 endef
 
 # Creates variables based on library names.
@@ -194,7 +196,7 @@ else
 all_recipes += $$(name)
 endif
 
-orig_src := $$(SOURCE_ROOT)/$$(name)-$$(version)
+orig_src := $$(SOURCE_ROOT)/$$(name)-$$(version).tar.zstd
 work_src := $$(WORK_ROOT)/$$(name)-$$(version)
 src := $$(work_src)
 bin_paths := $$(addprefix $$(OUTPUT)/bin/,$$(bin_names))
@@ -224,32 +226,33 @@ BUILD_FLAG := $$(SYSROOT)/$$(name).built
 
 ifneq (,$$(bin_paths))
 # Binaries need to be copied from SYSROOT/bin/ to OUTPUT/bin/.
-$$(bin_paths): $$(BUILD_FLAG) | $$$$(MUSL)
+$$(bin_paths): $$(BUILD_FLAG)
 	$$(eval $$(call activate_toolchain,$$@))
 	mkdir -p "$$(@D)"
-	mv "$$(SYSROOT)/bin/$$(@F)" "$$@"
+	install "$$(SYSROOT)/bin/$$(@F)" "$$@"
 	- $$(STRIP) --strip-unneeded "$$@"
 	ls -al "$$@"
 endif
 
 ifneq (,$$(lib_paths))
 # Libraries are already in their final location.
-$$(lib_paths): $$(BUILD_FLAG) | $$$$(MUSL) ;
+$$(lib_paths): $$(BUILD_FLAG) ;
 endif
 
 # This is main build recipe that the package's makefile must provide.
 # It should take the source code and output the built programs
 # and libraries into the SYSROOT directory tree.
 # Here we merely provide the recipe definition and base dependencies.
-$$(BUILD_FLAG): $$(src) | $$$$(MUSL)
+$$(BUILD_FLAG): $$(src)
 
 $$(orig_src):
 	echo orig $$(ORIG_SRC)
-	$$(call untar_to_dir,$$(URL),$$@)
+	$$(call tar_to_tar_zstd,$$(URL),$$@)
 
 $$(work_src): $$(orig_src)
 	rm -rf $$(SRC)
-	cp -a $$(ORIG_SRC) $$(SRC)
+	mkdir -p $$(SRC)
+	tar -C $$(SRC) -xf $$(ORIG_SRC)
 endef
 
 # Never implicitly pass this makefile's command-line variables
@@ -303,7 +306,7 @@ help usage:
 
 # Apparently the help output varies between toolchains so we'll try both.
 .PHONY: archlist
-archlist: | $$(MUSL)
+archlist:
 	$(eval $(call activate_toolchain,$@))
 	-@ "$(CC)" -march="x" 2>&1 | grep -F "valid arguments" || true
 	-@ "$(CC)" --target-help 2>&1 | sed -n '/Known.*-march/,/^$$/p' || true
@@ -312,7 +315,6 @@ archlist: | $$(MUSL)
 .PHONY: mostlyclean
 mostlyclean:
 	- $(RM) -r \
-	  $(filter-out $(MUSL_SRC),$(wildcard $(SOURCE_ROOT)/*-*)) \
 	  "$(SOURCE_ROOT)/"*.tgz \
 	  "$(SOURCE_ROOT)/"*.tmp
 

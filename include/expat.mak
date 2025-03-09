@@ -1,5 +1,5 @@
 NAME := libexpat
-EXPAT_VERSION := 2.6.2
+EXPAT_VERSION := 2.6.4
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so

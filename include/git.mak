@@ -1,5 +1,5 @@
 NAME := git
-GIT_VERSION := 2.46.0
+GIT_VERSION := 2.48.1
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so
@@ -10,7 +10,7 @@ GIT_URL := https://github.com/git/git/archive/refs/tags/v$(GIT_VERSION).tar.gz
 # The list of all programs that the package builds.
 # These targets can be called and built from the command line.
 # If the package provides no programs, leave this list empty.
-GIT_PROGRAMS := git git.tar.gz
+GIT_PROGRAMS := git git.tar.zstd
 
 
 # The list of library names that the package builds.
@@ -22,6 +22,7 @@ GIT_PROGRAMS := git git.tar.gz
 # Allow the user to add any make, autoconf, or configure options that they want.
 # Feel free to put any reasonable default values here.
 GIT_CONFIG = INSTALL_SYMLINKS=1
+LIB_SSL := wolfssl
 
 # This creates the recipe chain that downloads, extracts, builds, and strips
 # the binaries created by this package.  This makes it so that only the main
@@ -33,7 +34,7 @@ $(eval $(call create_recipes, \
 	$(GIT_PROGRAMS), \
 	$(GIT_LIBRARIES), \
 ))
-GIT_WOLFSSL_PATCH := $(src)/.wolfssl
+GIT_WOLFSSL_PATCH := $(src)/.github/wolfssl
 
 # This is the main build recipe!
 # Using $(BUILD_FLAG) as a target, it must compile the sources in $(SRC) and
@@ -41,13 +42,10 @@ GIT_WOLFSSL_PATCH := $(src)/.wolfssl
 # depends on any libraries, add their variable representations to this target's
 # dependency list.  For example, if the package depends on libsomething.a,
 # add $$(libsomething) to $(BUILD_FLAG)'s dependencies.
-$(GIT_WOLFSSL_PATCH): $(src)
-	cd "$(SRC)" && patch -N -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch
-	touch $(GIT_WOLFSSL_PATCH)
 
-TOOLS = AR=$(SYSROOT)/bin/$(TARGET)-ar AS=$(SYSROOT)/bin/$(TARGET)-as CC=$(SYSROOT)/bin/$(TARGET)-cc CXX=$(SYSROOT)/bin/$(TARGET)-g++ LD=$(SYSROOT)/bin/$(TARGET)-ld NM=$(SYSROOT)/bin/$(TARGET)-nm OBJCOPY=$(SYSROOT)/bin/$(TARGET)-objcopy OBJDUMP=$(SYSROOT)/bin/$(TARGET)-objdump RANLIB=$(SYSROOT)/bin/$(TARGET)-ranlib READELF=$(SYSROOT)/bin/$(TARGET)-readelf STRIP=$(SYSROOT)/bin/$(TARGET)-strip prefix="$(SYSROOT)"
+TOOLS = "AR=$(AR)" "AS=$(AS)" "CC=$(CC)" "CXX=$(CXX)" "NM=$(NM)" "OBJCOPY=$(OBJCOPY)" "OBJDUMP=$(OBJDUMP)" "RANLIB=$(RANLIB)" "READELF=$(READELF)" "STRIP=$(STRIP)" prefix="$(SYSROOT)"
 
-$(BUILD_FLAG): $$(libz) $$(libcurl) $$(libssl) $$(openssl) $$(curl) $(libexpat) $(GIT_WOLFSSL_PATCH)
+$(BUILD_FLAG): $$(libz) $$(libcurl) $$(wolfssl) $$(curl) $(libexpat)
 # This activates the cross-compiler toolchain by setting/exporting a lot of variables.
 # Without this, builds would default to the system's compilers and libraries.
 	$(eval $(call activate_toolchain,$@))
@@ -56,31 +54,25 @@ $(BUILD_FLAG): $$(libz) $$(libcurl) $$(libssl) $$(openssl) $$(curl) $(libexpat) 
 # Try to only hard-code the flags that are critical to a successful static build.
 # Optional flags should be put in GIT_CONFIG so the user can override them.
 
+	bash -c "cd \"$(SRC)\" && test -f $(GIT_WOLFSSL_PATCH) || patch -N -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch; true"
+	touch $(GIT_WOLFSSL_PATCH)
+	gsed -i '/LINK_FUZZ_PROGRAMS/d' "$(SRC)/config.mak.uname"
 	$(MAKE) -C "$(SRC)" clean
-	- $(RM) -rf /tmp/git
+	- $(RM) -rf $(SYSROOT)/tmp/git
 	$(MAKE) -C "$(SRC)" V=1 $(TOOLS) \
-		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) \
-		CURL_LDFLAGS="-L/build/sysroot/aarch64-linux-musl/lib -lcurl $(SSL_CURL_FLAGS) -lm -lz" \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG)
+		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) CURL_CONFIG="$(SYSROOT)/bin/curl-config" \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) uname_S=Linux
 	$(MAKE) -C "$(SRC)" $(TOOLS) prefix="$(SYSROOT)" \
-		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) \
-		CURL_LDFLAGS="-L/build/sysroot/aarch64-linux-musl/lib -lcurl $(SSL_CURL_FLAGS) -lm -lz" \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) install
+		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) CURL_CONFIG="$(SYSROOT)/bin/curl-config" \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) uname_S=Linux install
 	$(MAKE) -C "$(SRC)" $(TOOLS) prefix="/" \
-		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) \
-		CURL_LDFLAGS="-L/build/sysroot/aarch64-linux-musl/lib -lcurl $(SSL_CURL_FLAGS) -lm -lz" \
-		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) DESTDIR=/tmp/git install
-	cd /tmp/git && tar czf $(SYSROOT)/bin/git.tar.gz *
-	cd "$(SRC)" && patch -R -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch
+		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) CURL_CONFIG="$(SYSROOT)/bin/curl-config" \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) uname_S=Linux DESTDIR=$(SYSROOT)/tmp/git bindir="/usr/bin" install
+	cd $(SYSROOT)/tmp/git && tar czf $(SYSROOT)/bin/git.tar.zstd *
 
 SSL_FLAGS :=
-SSL_CURL_FLAGS := -lssl -lcrypto
 ifeq (wolfssl,$(LIB_SSL))
 SSL_FLAGS := USE_WOLFSSL=1 OPENSSL_SHA1=1 OPENSSL_SHA256=1 WOLFSSSLDIR="$(SYSROOT)"
-SSL_CURL_FLAGS := -lwolfssl
-
-else ifeq (wolfssl,$(CURL_SSL))
-SSL_CURL_FLAGS := $(SSL_CURL_FLAGS) -lwolfssl
 endif
 
 # All programs should add themselves to the ALL_PROGRAMS list.
