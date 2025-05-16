@@ -20,6 +20,7 @@ $(eval $(call create_recipes, \
 # See: https://github.com/facebook/zstd/issues/3190
 $(BUILD_FLAG): $$(libz)
 	$(eval $(call activate_toolchain,$@))
+	"$(SED)" -i -e 's@ \*@ ./*@g' "$(SRC)"/*/Makefile
 	$(MAKE) -C "$(SRC)" clean
 	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
 	  $(MAKE) -C "$(SRC)"

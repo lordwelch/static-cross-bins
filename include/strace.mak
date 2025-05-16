@@ -14,7 +14,7 @@ $(eval $(call create_recipes, \
 	$(STRACE_LIBRARIES), \
 ))
 
-HAVE_SED_R := $(shell sed -r '' </dev/null 2>/dev/null && echo OK)
+HAVE_SED_R := $(shell "$(SED)" -r '' </dev/null 2>/dev/null && echo OK)
 HAVE_GSED := $(shell command -v gsed)
 
 # NOTE: strace's INSTALL guide specifically requests _not_ using autoreconf

@@ -14,7 +14,7 @@ $(eval $(call create_recipes, \
 
 $(BUILD_FLAG): $$(libz)
 	$(eval $(call activate_toolchain,$@))
-	cd "$(SRC)" && sed -i -e 's@cut >/dev/null 2>&1 </dev/null@which cut >/dev/null 2>\&1 </dev/null@g' configure*
+	cd "$(SRC)" && "$(SED)" -i -e 's@cut >/dev/null 2>&1 </dev/null@which cut >/dev/null 2>\&1 </dev/null@g' configure*
 	cd "$(SRC)" && autoreconf -i
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \

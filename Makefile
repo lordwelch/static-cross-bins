@@ -91,10 +91,17 @@ else
 $(error No curl or wget detected, please manually specify the DOWNLOAD command.)
 endif
 
+# Try to find gsed
+ifeq ($(shell command -v gsed),)
+    SED := sed
+else
+    SED := gsed
+endif
+
 # LibreSSL is a drop-in replacement for OpenSSL that's smaller and easier to build.
 OPENSSL := libressl
 # OPENSSL := openssl
-
+TARGET := x86_64-linux-musl
 BUILD_TRIPLE := $(shell $(filter-out --target%,$(CC)) -dumpmachine 2>/dev/null)
 CONFIGURE_DEFAULTS = --build="$(BUILD_TRIPLE)" --host="$(TARGET)" --prefix="$(SYSROOT)"
 
@@ -114,7 +121,7 @@ TOOLCHAIN_ROOT := $(MAKEFILE_DIR)/sysroot
 
 SYSROOT := $(TOOLCHAIN_ROOT)/$(TARGET)
 OUTPUT := $(OUTPUT_ROOT)/$(TARGET)
-PKG_CONFIG_PATH := $(TOOLCHAIN_ROOT)/lib/pkgconfig
+PKG_CONFIG_PATH := $(SYSROOT)/lib/pkgconfig
 
 CMAKE_DEFAULTS = -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$(SYSROOT) -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_FIND_ROOT_PATH=$(TOOLCHAIN_ROOT) -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
 # Having whitespace in our build paths _will_ result in failures.
@@ -138,15 +145,15 @@ define activate_toolchain
 $(call activate_paths,$(1))
 $(1): export HOSTCC=zig cc
 $(1): export HOSTCXX=zig c++
-$(1): export AR=/opt/homebrew/bin/zig ar
+$(1): export AR=zig ar
 $(1): export AS=llvm-as
-$(1): export CC=/opt/homebrew/bin/zig cc --target=$(TARGET)
-$(1): export CXX=/opt/homebrew/bin/zig c++ --target=$(TARGET)
+$(1): export CC=zig cc --target=$(TARGET)
+$(1): export CXX=zig c++ --target=$(TARGET)
 # $(1): export LD=llvm-ld
 $(1): export NM=llvm-nm
-$(1): export OBJCOPY=/opt/homebrew/bin/zig objcopy
+$(1): export OBJCOPY=zig objcopy
 $(1): export OBJDUMP=llvm-objdump
-$(1): export RANLIB=/opt/homebrew/bin/zig ranlib
+$(1): export RANLIB=zig ranlib
 $(1): export READELF=llvm-readelf
 $(1): export STRIP=llvm-strip
 endef
@@ -309,7 +316,7 @@ help usage:
 archlist:
 	$(eval $(call activate_toolchain,$@))
 	-@ "$(CC)" -march="x" 2>&1 | grep -F "valid arguments" || true
-	-@ "$(CC)" --target-help 2>&1 | sed -n '/Known.*-march/,/^$$/p' || true
+	-@ "$(CC)" --target-help 2>&1 | "$(SED)" -n '/Known.*-march/,/^$$/p' || true
 
 # Cleans all sources except for musl.
 .PHONY: mostlyclean
