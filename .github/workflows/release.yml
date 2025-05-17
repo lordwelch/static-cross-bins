@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Install Prerequisites
         run: |
-          apk add zig zstd sed libtool curl alpine-sdk bison autoconf automake
+          apk add zig zstd sed libtool curl alpine-sdk bison autoconf automake xz bzip2 bzip3
 
       - name: Checkout Repo
         uses: actions/checkout@v3
