@@ -10,18 +10,13 @@ on:
 
 jobs:
   automated-releases:
-    runs-on: ubuntu-latest
+    runs-on: alpine
 
     strategy:
       fail-fast: false
       matrix:
         target:
           - aarch64-linux-musl
-          - arm-linux-musleabi
-          - armeb-linux-musleabi
-          - i686-linux-musl
-          - mips-linux-musl
-          - mipsel-linux-musl
           - x86_64-linux-musl
 
     concurrency:
@@ -35,18 +30,10 @@ jobs:
     steps:
       - name: Install Prerequisites
         run: |
-          sudo apt-get install -y \
-            gcc g++ \
-            make autoconf automake libtool patch \
-            flex bison \
-            wget \
-            tar gzip bzip2 xz-utils
+          sudo apk add zig zstd sed libtool curl alpine-sdk bison autoconf automake
 
       - name: Checkout Repo
         uses: actions/checkout@v3
-
-      - name: Build Toolchain
-        run: make -w -j2 TARGET="${TARGET}" musl
 
       - name: Build Static Binaries
         run: make -w -j2 TARGET="${TARGET}" all
@@ -61,10 +48,10 @@ jobs:
         run: cd "${OUTPUT}" && sha1sum "./"* | tee "hashes.sha1"
 
       - name: Package Results
-        run: tar --strip-components=3 -czvf "${TARGET}.tar.gz" "${OUTPUT}/"*
+        run: tar --zstd --strip-components=3 -czvf "${TARGET}.tar.zst" "${OUTPUT}/"*
 
       - name: Package Hash
-        run: sha1sum "${TARGET}.tar.gz"
+        run: sha1sum "${TARGET}.tar.zst"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
