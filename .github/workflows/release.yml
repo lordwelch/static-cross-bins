@@ -49,7 +49,7 @@ jobs:
         run: cd "${OUTPUT}" && sha1sum "./"* | tee "hashes.sha1"
 
       - name: Package Results
-        run: tar --zstd --strip-components=3 -czvf "${TARGET}.tar.zst" "${OUTPUT}/"*
+        run: tar --zstd --strip-components=3 -cvf "${TARGET}.tar.zst" "${OUTPUT}/"*
 
       - name: Package Hash
         run: sha1sum "${TARGET}.tar.zst"
