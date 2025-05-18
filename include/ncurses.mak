@@ -20,6 +20,8 @@ $(eval $(call create_recipes, \
 # before finally failing for unrelated reasons.
 $(BUILD_FLAG):
 	$(eval $(call activate_toolchain,$@))
+	export BUILD_CC="$(HOSTCC)"
+	export BUILD_CPP="$(HOSTCXX)"
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
 	  --without-manpages --without-progs --disable-lib-suffixes --disable-ext-funcs \
