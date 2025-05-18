@@ -58,4 +58,4 @@ $(BUILD_FLAG): $$(libmnl)
 ALL_PROGRAMS += $(IPROUTE2_PROGRAMS)
 
 # Only programs that most users would want should be added to DEFAULT_PROGRAMS.
-# DEFAULT_PROGRAMS += $(IPROUTE2_PROGRAMS)
+DEFAULT_PROGRAMS += $(IPROUTE2_PROGRAMS)

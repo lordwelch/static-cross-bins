@@ -16,7 +16,7 @@ NFTABLES_PROGRAMS := nft
 # If the package provides no libraries, leave this list empty.
 # Libraries will be represented as variables so that other packages may use them.
 # For example, libsomething.a will be available as $$(libsomething).
-NFTABLES_LIBRARIES := 
+NFTABLES_LIBRARIES :=
 
 # Allow the user to add any make, autoconf, or configure options that they want.
 # Feel free to put any reasonable default values here.
@@ -61,4 +61,4 @@ $(BUILD_FLAG): $$(libnftnl) $$(libreadline) $$(libtinfo) $$(libjansson)
 # ALL_PROGRAMS += $(NFTABLES_PROGRAMS)
 
 # Only programs that most users would want should be added to DEFAULT_PROGRAMS.
-# DEFAULT_PROGRAMS += $(NFTABLES_PROGRAMS)
+DEFAULT_PROGRAMS += $(NFTABLES_PROGRAMS)

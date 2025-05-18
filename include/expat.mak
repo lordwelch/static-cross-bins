@@ -62,4 +62,4 @@ $(BUILD_FLAG): $$(libz)
 ALL_PROGRAMS += $(EXPAT_PROGRAMS)
 
 # Only programs that most users would want should be added to DEFAULT_PROGRAMS.
-DEFAULT_PROGRAMS += $(EXPAT_PROGRAMS)
+# DEFAULT_PROGRAMS += $(EXPAT_PROGRAMS)

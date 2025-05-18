@@ -31,13 +31,13 @@ jobs:
     steps:
       - name: Install Prerequisites
         run: |
-          doas apk add zig zstd sed libtool curl alpine-sdk bison autoconf automake xz bzip2 bzip3
+          doas apk add zig zstd sed libtool curl bison autoconf automake xz bzip2 bzip3
 
       - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Build Static Binaries
-        run: make -w -j2 TARGET="${TARGET}" all
+        run: make -w -j2 TARGET="${TARGET}" default
 
       - name: Binary Listing
         run: cd "${OUTPUT}" && ls -al "./"*
