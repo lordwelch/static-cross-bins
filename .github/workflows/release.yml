@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Static Binaries
-        run: make -w -j2 TARGET="${TARGET}" default
+        run: make -w -j4 TARGET="${TARGET}" default
 
       - name: Binary Listing
         run: cd "${OUTPUT}" && ls -al "./"*

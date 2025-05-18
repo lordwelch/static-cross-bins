@@ -145,17 +145,21 @@ define activate_toolchain
 $(call activate_paths,$(1))
 $(1): export HOSTCC=zig cc
 $(1): export HOSTCXX=zig c++
+$(1): export BUILD_CC=zig cc
+$(1): export BUILD_CPP=zig c++
+$(1): export CC_FOR_BUILD=zig cc
+$(1): export CXX_FOR_BUILD=zig c++
 $(1): export AR=zig ar
-$(1): export AS=llvm-as
+$(1): export AS=as
 $(1): export CC=zig cc --target=$(TARGET)
 $(1): export CXX=zig c++ --target=$(TARGET)
-# $(1): export LD=llvm-ld
-$(1): export NM=llvm-nm
+# $(1): export LD=ld
+$(1): export NM=nm
 $(1): export OBJCOPY=zig objcopy
-$(1): export OBJDUMP=llvm-objdump
+$(1): export OBJDUMP=objdump
 $(1): export RANLIB=zig ranlib
-$(1): export READELF=llvm-readelf
-$(1): export STRIP=llvm-strip
+$(1): export READELF=readelf
+$(1): export STRIP=strip
 endef
 
 # Downloads and unpacks a tar file.
