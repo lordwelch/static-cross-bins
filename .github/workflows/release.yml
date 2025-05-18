@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Install Prerequisites
         run: |
-          doas apk add zig zstd sed libtool curl bison autoconf automake xz bzip2 bzip3
+          doas apk add zig zstd sed libtool curl bison autoconf automake xz bzip2 bzip3 cmd:pkg-config
 
       - name: Checkout Repo
         uses: actions/checkout@v3
