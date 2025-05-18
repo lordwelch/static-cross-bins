@@ -24,6 +24,7 @@ $(BUILD_FLAG):
 	export BUILD_CPP="$(HOSTCXX)"
 	cd "$(SRC)" && ./configure \
 	  $(CONFIGURE_DEFAULTS) \
+	  --with-build-cc "$(HOSTCC)" --with-build-cpp "$(HOSTCXX)" \
 	  --without-manpages --without-progs --disable-lib-suffixes --disable-ext-funcs \
 	  --without-tack --without-tests --with-termlib --enable-termcap --without-debug \
 	  $(NCURSES_CONFIG) \
