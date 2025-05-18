@@ -10,7 +10,7 @@ IPROUTE2_URL := https://mirrors.edge.kernel.org/pub/linux/utils/net/iproute2/ipr
 # The list of all programs that the package builds.
 # These targets can be called and built from the command line.
 # If the package provides no programs, leave this list empty.
-IPROUTE2_PROGRAMS := ip iproute2.tar.zstd
+IPROUTE2_PROGRAMS := ip iproute2.tar.zst
 
 # The list of library names that the package builds.
 # If the package provides no libraries, leave this list empty.
@@ -51,7 +51,7 @@ $(BUILD_FLAG): $$(libmnl)
 	$(MAKE) -C "$(SRC)" clean EXTRA_CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" DESTDIR=$(SYSROOT)/tmp/iproute2
 	$(MAKE) -C "$(SRC)" EXTRA_CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" DESTDIR=$(SYSROOT)/tmp/iproute2
 	$(MAKE) -C "$(SRC)" install EXTRA_CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" DESTDIR=$(SYSROOT)/tmp/iproute2
-	cd $(SYSROOT)/tmp/iproute2 && rm -rf share/bash-completion/ share/bash include && tar czf $(SYSROOT)/bin/iproute2.tar.zstd *
+	cd $(SYSROOT)/tmp/iproute2 && rm -rf share/bash-completion/ share/bash include && tar cf - * | zstd -f -o $(SYSROOT)/bin/iproute2.tar.zst
 	cp -a $(SYSROOT)/tmp/iproute2/sbin/ip $(SYSROOT)/bin/
 
 # All programs should add themselves to the ALL_PROGRAMS list.

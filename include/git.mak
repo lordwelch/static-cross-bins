@@ -68,7 +68,7 @@ $(BUILD_FLAG): $$(libz) $$(libcurl) $$(wolfssl) $$(curl) $(libexpat)
 	$(MAKE) -C "$(SRC)" $(TOOLS) prefix="/" \
 		NO_REGEX=YesPlease NO_ICONV=YesPlease NO_GETTEXT=YesPlease NO_TCLTK=YesPlease NO_PERL=1 $(SSL_FLAGS) CURL_CONFIG="$(SYSROOT)/bin/curl-config" \
 		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(GIT_CONFIG) uname_S=Linux DESTDIR=$(SYSROOT)/tmp/git bindir="/usr/bin" install
-	cd $(SYSROOT)/tmp/git && tar czf $(SYSROOT)/bin/git.tar.zst *
+	cd $(SYSROOT)/tmp/git && tar cf - * | zstd -f -o $(SYSROOT)/bin/git.tar.zst
 
 SSL_FLAGS :=
 ifeq (wolfssl,$(LIB_SSL))
