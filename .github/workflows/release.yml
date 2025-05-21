@@ -62,5 +62,5 @@ jobs:
           tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
           prerelease: ${{ github.ref_type != 'tag' }}
           generate_release_notes: ${{ github.ref_type == 'tag' }}
-          files: "${{ matrix.target }}.tar.gz"
+          files: "${{ matrix.target }}.tar.zst"
           fail_on_unmatched_files: true
