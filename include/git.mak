@@ -1,5 +1,5 @@
 NAME := git
-GIT_VERSION := 2.48.1
+GIT_VERSION := 2.51.2
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so
