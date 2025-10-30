@@ -1,6 +1,6 @@
 NAME := ncurses
 NCURSES_VERSION := 6.5
-NCURSES_URL := https://ftp.gnu.org/gnu/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
+NCURSES_URL := https://invisible-mirror.net/archives/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
 NCURSES_PROGRAMS :=
 NCURSES_LIBRARIES := libncurses.a libncurses++.a libform.a libmenu.a libpanel.a libtinfo.a
 
