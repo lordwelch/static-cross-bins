@@ -3,12 +3,13 @@ FROM docker.io/library/alpine:latest
 
 # This is all that's required for the build process.
 # Some packages are already installed but are included for completeness.
-RUN apk add install -y \
+RUN apk update
+RUN apk add cmd:install \
     zig llvm \
     make autoconf automake libtool patch \
     flex bison \
     curl \
-    tar zstd gzip bzip2 xz-utils cmake build-essential pkg-config linux-headers-generic
+    tar zstd gzip bzip2 cmd:xz cmake cmd:pkg-config linux-headers
 
 RUN install -d -o 1000 -g 1000 "/build"
 COPY "Makefile" "/build/"

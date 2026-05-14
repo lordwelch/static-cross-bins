@@ -9,5 +9,5 @@ if [ -e .docker_context ]; then
 fi
 mkdir -p .docker_context output sources work sysroot
 cp -a Dockerfile Makefile include .docker_context
-docker build -t static-builder .docker_context
-docker run -it -v "${PWD}/output":"/build/output:Z" -v "${PWD}/sources":"/build/sources:Z" -v "${PWD}/work":"/build/work:Z" -v "${PWD}/sysroot":"/build/sysroot:Z" --rm static-builder "$@"
+podman build -t static-builder .docker_context
+podman run -it --userns=keep-id -v "${PWD}/output":"/build/output:Z" -v "${PWD}/sources":"/build/sources:Z" -v "${PWD}/work":"/build/work:Z" -v "${PWD}/sysroot":"/build/sysroot:Z" --rm static-builder "$@"

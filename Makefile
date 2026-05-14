@@ -49,7 +49,7 @@ endif
 ########################## Flags ###########################
 
 # We need access to `command -v` to check if programs exist.
-SHELL := /bin/bash
+SHELL := /bin/sh
 
 CFLAGS = -g0 -Os
 CXXFLAGS = -g0 -Os
@@ -153,8 +153,9 @@ $(1): export AR=zig ar
 $(1): export AS=as
 $(1): export CC=zig cc --target=$(TARGET)
 $(1): export CXX=zig c++ --target=$(TARGET)
-# $(1): export LD=ld
-$(1): export NM=nm
+$(1): export LD=llvm-link
+$(1): export NM=llvm-nm
+$(1): export MT=llvm-mt
 $(1): export OBJCOPY=zig objcopy
 $(1): export OBJDUMP=objdump
 $(1): export RANLIB=zig ranlib
