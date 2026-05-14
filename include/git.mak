@@ -1,5 +1,6 @@
 NAME := git
-GIT_VERSION := 2.54.0
+GIT_VERSION := 2.53.0
+# Note: 2.54 fails with some pragma stuff. Related to wolfssl
 
 # The download URL should point to a tar archive of some sort.
 # On most systems, tar will handle most compression formats, so
@@ -54,7 +55,7 @@ $(BUILD_FLAG): $$(libz) $$(libcurl) $$(wolfssl) $$(curl) $(libexpat)
 # Try to only hard-code the flags that are critical to a successful static build.
 # Optional flags should be put in GIT_CONFIG so the user can override them.
 
-	bash -c "cd \"$(SRC)\" && test -f $(GIT_WOLFSSL_PATCH) || patch -N -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch; true"
+	sh -c "cd \"$(SRC)\" && test -f $(GIT_WOLFSSL_PATCH) || patch -N -p1 < $(MAKEFILE_DIR)/include/git-wolfssl.patch; true"
 	touch $(GIT_WOLFSSL_PATCH)
 	"$(SED)" -i '/LINK_FUZZ_PROGRAMS/d' "$(SRC)/config.mak.uname"
 	$(MAKE) -C "$(SRC)" clean

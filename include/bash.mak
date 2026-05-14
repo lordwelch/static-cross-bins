@@ -1,5 +1,5 @@
 NAME := bash
-BASH_VERSION := 5.2.37
+BASH_VERSION := 5.3
 BASH_URL := https://mirror.cs.odu.edu/gnu/bash/bash-$(BASH_VERSION).tar.gz
 BASH_PROGRAMS := bash
 BASH_LIBRARIES :=

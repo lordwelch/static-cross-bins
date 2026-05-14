@@ -1,5 +1,5 @@
 NAME := readline
-READLINE_VERSION := 8.2
+READLINE_VERSION := 8.3
 READLINE_URL := https://mirror.cs.odu.edu/gnu/readline/readline-$(READLINE_VERSION).tar.gz
 READLINE_PROGRAMS :=
 READLINE_LIBRARIES := libreadline.a libhistory.a
