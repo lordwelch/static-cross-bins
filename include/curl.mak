@@ -1,5 +1,5 @@
 NAME := curl
-CURL_VERSION := 8.12.1
+CURL_VERSION := 8.20.0
 CURL_URL := https://github.com/curl/curl/releases/download/curl-$(subst .,_,$(CURL_VERSION))/curl-$(CURL_VERSION).tar.gz
 CURL_PROGRAMS := curl
 CURL_LIBRARIES := libcurl.a
