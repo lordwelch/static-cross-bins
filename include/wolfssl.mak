@@ -1,5 +1,5 @@
 NAME := wolfssl
-WOLFSSL_VERSION := 5.7.6
+WOLFSSL_VERSION := 5.9.1
 WOLFSSL_URL := https://github.com/wolfSSL/wolfssl/archive/refs/tags/v$(WOLFSSL_VERSION)-stable.tar.gz
 WOLFSSL_PROGRAMS :=
 WOLFSSL_LIBRARIES := libwolfssl.a
